@@ -9,7 +9,7 @@ class User(models.Model):
         ('U', 'user'),
         ('P', 'passive'),
     )
-    uid = models.CharField(max_length=255)
+    uid = models.CharField(max_length=255, primary_key=True)
     username = models.CharField(max_length=255)
     role = models.CharField(max_length=255, choices=ROLE_CHOICES)
     money = models.IntegerField(default=0)
@@ -19,7 +19,7 @@ class User(models.Model):
     
 
 class Code(models.Model):
-    code = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, primary_key=True)
     issuer = models.ForeignKey(User, on_delete=models.CASCADE)
     money = models.IntegerField(default=0)
     description = models.CharField(max_length=255)
