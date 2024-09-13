@@ -7,22 +7,6 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_add_user(self):
-        response = self.client.post(reverse('sign-up'), {
-            'uid': 'test_uid',
-            'username': 'test_username',
-            'role': 'U'
-        }, content_type='application/json')
-        self.assertEqual(response.status_code, 201)
-
-    def test_add_user_invalid(self):
-        response = self.client.post(reverse('sign-up'), {
-            'uid': 'test_uid',
-            'username': '',
-            'role': 'U'
-        }, content_type='application/json')
-        self.assertEqual(response.status_code, 400)
-
     def test_get_user(self):
         user = User.objects.create(
             uid='test_uid',

@@ -11,7 +11,7 @@ class User(models.Model):
     )
     uid = models.CharField(max_length=255, primary_key=True)
     username = models.CharField(max_length=255)
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES, default='P')
     money = models.IntegerField(default=0)
 
     def __str__(self):

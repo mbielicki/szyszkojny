@@ -1,4 +1,6 @@
+import axios from "axios";
 import { auth, provider, useAuth } from "../firebase";
+import { backend } from "@/config";
 
 export class SignInError extends Error {
     constructor(message: string) {

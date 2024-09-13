@@ -22,16 +22,17 @@ def authenticate(request):
     return Response(decoded_token)
 
 @api_view(['POST'])
-def add_user(request):
-    user_to_create = request.data.user
-    serializer = UserSerializer(data=user_to_create)
-    # TODO check if money == 0
-    # check tokenId is valid
-    if serializer.is_valid():
-        serializer.save()
+def log_in(request):
+    id_token = request.data['id_token']
+    decoded_token = verify_id_token(id_token, clock_skew_seconds=5)
+    uid = decoded_token['uid']
+    auth.get_user(uid) # check if user exists
+    user, created =User.objects.get_or_create(uid=uid, defaults={'username': decoded_token['name']})
+    serializer = UserSerializer(user)
+    if created:
+        return Response(serializer.data, status=201)
     else:
-        return Response(serializer.errors, status=400)
-    return Response(serializer.data, status=201)
+        return Response(serializer.data, status=200)
 
 @api_view(['GET'])
 def get_user(request, uid):

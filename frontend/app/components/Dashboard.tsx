@@ -1,18 +1,21 @@
 import { useAuth } from "../firebase";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProfilePicture from "./ProfilePicture";
 import axios from "axios";
 import { backend } from "../../config.js"
 import LogOut from "./LogOut";
 
 export default function Dashboard() {
+    const [money, setMoney] = useState<number | null>(null)
     const [user, setUser] = useAuth()
     useEffect(() => {
-        const authenticate = async () => {
-            if (!user) throw new Error('No user to authenticate')
-            axios.post(backend + 'authenticate/', { id_token: await user.getIdToken() })
+        const logIn = async () => {
+            if (!user) return
+            const res = await axios.post(backend + 'log-in/', { id_token: await user.getIdToken() })
+            if ([200, 201].includes(res.status))
+                setMoney(res.data['money'])
         }
-        authenticate()
+        logIn()
     }, [user])
     return (
         <div className="flex h-full flex-col">
@@ -23,7 +26,7 @@ export default function Dashboard() {
             <main className="flex-1 flex flex-col items-center justify-center gap-2">
                 <h1 className="text-4xl">Czuwaj!</h1>
                 <div>Twoje szyszkojny:</div>
-                <h2 className="text-3xl">50 🪙</h2>
+                <h2 className="text-3xl">{money ?? "..."} 🪙</h2>
             </main>
             <footer className="p-2 flex gap-6 flex-wrap items-center justify-center text-4xl">
                 <LogOut className="text-xl" />
