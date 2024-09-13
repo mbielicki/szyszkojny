@@ -2,11 +2,18 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth"
 import { useEffect } from "react";
 import Image from "next/image";
-import ProfilePicture from "./profilePicture";
+import ProfilePicture from "./ProfilePicture";
+import axios from "axios";
+import { backend } from "../../config.js"
 
 export default function Dashboard({ user }: { user: firebase.User }) {
     useEffect(() => {
         console.log(user)
+        const authenticate = async () => {
+            axios.post(backend + 'authenticate/', { id_token: await user.getIdToken() })
+                .then(res => console.log(res))
+        }
+        authenticate()
     }, [user])
     return (
         <div className="flex h-full flex-col">

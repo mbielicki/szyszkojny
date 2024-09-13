@@ -1,13 +1,32 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from firebase_admin import initialize_app, credentials, auth
+from firebase_admin.auth import verify_id_token
 
-from api.models import User
-
+from .models import User
 from .serializers import UserSerializer
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+cred = credentials.Certificate(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY'))
+firebase_app = initialize_app(cred)
+
+@api_view(['POST'])
+def authenticate(request):
+    id_token = request.data['id_token']
+    decoded_token = verify_id_token(id_token)
+    uid = decoded_token['uid']
+    auth.get_user(uid)  # check if user exists
+    return Response(decoded_token)
 
 @api_view(['POST'])
 def add_user(request):
-    serializer = UserSerializer(data=request.data)
+    user_to_create = request.data.user
+    serializer = UserSerializer(data=user_to_create)
+    # TODO check if money == 0
+    # check tokenId is valid
     if serializer.is_valid():
         serializer.save()
     else:
