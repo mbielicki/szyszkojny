@@ -16,7 +16,7 @@ firebase_app = initialize_app(cred)
 @api_view(['POST'])
 def authenticate(request):
     id_token = request.data['id_token']
-    decoded_token = verify_id_token(id_token)
+    decoded_token = verify_id_token(id_token, clock_skew_seconds=5)
     uid = decoded_token['uid']
     auth.get_user(uid)  # check if user exists
     return Response(decoded_token)
