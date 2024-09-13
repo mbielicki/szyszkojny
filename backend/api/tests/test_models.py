@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from api.utils import now
 from django.test import TestCase
-from .models import User, Code, Transaction
+from api.models import User, Code, Transaction
 
 class UserModelTestCase(TestCase):
     def test_user_creation(self):
@@ -28,8 +28,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=datetime.now(),
-            expires=datetime.now() + timedelta(days=1)
+            activates=now(),
+            expires=now(d_days=1)
         )
         self.assertEqual(code.code, 'test_code')
         self.assertEqual(code.issuer.username, 'test_username')
@@ -42,8 +42,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=datetime.now(),
-            expires=datetime.now() + timedelta(days=1)
+            activates=now(),
+            expires=now(d_days=1)
         )
         self.assertTrue(code.is_valid())
 
@@ -53,8 +53,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=datetime.now() - timedelta(days=2),
-            expires=datetime.now() - timedelta(days=1)
+            activates=now(d_days=-2),
+            expires=now(d_days=-1)
         )
         self.assertFalse(code.is_valid())
 
@@ -64,8 +64,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=datetime.now() + timedelta(days=1),
-            expires=datetime.now() + timedelta(days=2)
+            activates=now(d_days=1),
+            expires=now(d_days=2)
         )
         self.assertFalse(code.is_valid())
 
@@ -77,10 +77,10 @@ class TransactionModelTestCase(TestCase):
             issuer=user,
             money=100,
             description='Test code',
-            activates=datetime.now(),
-            expires=datetime.now() + timedelta(days=1)
+            activates=now(),
+            expires=now(d_days=1)
         )
-        timestamp = datetime.now()
+        timestamp = now()
         transaction = Transaction.objects.create(
             receiver=user,
             code=code,

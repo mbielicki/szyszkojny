@@ -1,5 +1,5 @@
-from datetime import datetime
 from django.db import models
+from api.utils import now
 
 # Create your models here.
 class User(models.Model):
@@ -29,8 +29,8 @@ class Code(models.Model):
     people_limit = models.IntegerField(null=True)
 
     def is_valid(self):
-        was_activated = self.activates < datetime.now()
-        expired = self.expires < datetime.now()
+        was_activated = self.activates <= now()
+        expired = self.expires < now()
         return was_activated and not expired
 
 class Transaction(models.Model):
