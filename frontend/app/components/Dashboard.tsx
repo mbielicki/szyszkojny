@@ -6,7 +6,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import MyBalance from "./MyBalance";
 import { Navigation, useNav } from "../hooks/useNav";
-import MyCodes from "./MyCodes";
+import NewCode from "./NewCode";
 
 export default function Dashboard() {
     const [money, setMoney] = useState<number | null>(null)
@@ -27,7 +27,7 @@ export default function Dashboard() {
         <div className="flex h-full flex-col">
             <Header />
             {nav === Navigation.balance && <MyBalance money={money} />}
-            {nav === Navigation.codes && <MyCodes />}
+            {nav === Navigation.newCode && <NewCode />}
             <Footer nav={nav} setNav={setNav} />
         </div>
     );
