@@ -1,4 +1,4 @@
-import { User } from "../firebase"
+import { User } from "../hooks/firebase"
 import Image from "next/image";
 
 export default function ProfilePicture({ user }: { user: User | null }) {

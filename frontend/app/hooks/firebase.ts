@@ -29,3 +29,10 @@ export const useAuth: () => [User | null, Dispatch<SetStateAction<User | null>>]
     return [user, setUser]
 }
 
+
+export class NoUserError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "NoUserError";
+    }
+}

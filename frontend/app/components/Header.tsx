@@ -1,4 +1,4 @@
-import { User } from "../firebase";
+import { User } from "../hooks/firebase";
 import ProfilePicture from "./ProfilePicture";
 
 export default function Header({ user }: { user: User | null }) {

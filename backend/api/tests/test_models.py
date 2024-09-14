@@ -1,4 +1,4 @@
-from api.utils import now
+from api.utils import from_now
 from django.test import TestCase
 from api.models import User, Code, Transaction
 
@@ -28,8 +28,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=now(),
-            expires=now(d_days=1)
+            activates=from_now(),
+            expires=from_now(d_days=1)
         )
         self.assertEqual(code.code, 'test_code')
         self.assertEqual(code.issuer.username, 'test_username')
@@ -42,8 +42,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=now(),
-            expires=now(d_days=1)
+            activates=from_now(),
+            expires=from_now(d_days=1)
         )
         self.assertTrue(code.is_valid())
 
@@ -53,8 +53,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=now(d_days=-2),
-            expires=now(d_days=-1)
+            activates=from_now(d_days=-2),
+            expires=from_now(d_days=-1)
         )
         self.assertFalse(code.is_valid())
 
@@ -64,8 +64,8 @@ class CodeModelTestCase(TestCase):
             issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
             money=100,
             description='Test code',
-            activates=now(d_days=1),
-            expires=now(d_days=2)
+            activates=from_now(d_days=1),
+            expires=from_now(d_days=2)
         )
         self.assertFalse(code.is_valid())
 
@@ -77,10 +77,10 @@ class TransactionModelTestCase(TestCase):
             issuer=user,
             money=100,
             description='Test code',
-            activates=now(),
-            expires=now(d_days=1)
+            activates=from_now(),
+            expires=from_now(d_days=1)
         )
-        timestamp = now()
+        timestamp = from_now()
         transaction = Transaction.objects.create(
             receiver=user,
             code=code,

@@ -1,4 +1,4 @@
-import { auth, useAuth } from "../firebase";
+import { auth, useAuth } from "../hooks/firebase";
 
 export default function LogOut({ className, text = "wyloguj" }: { className?: string, text?: string }) {
     const [user, setUser] = useAuth()

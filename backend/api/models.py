@@ -1,7 +1,6 @@
 from django.db import models
-from api.utils import now
+from api.utils import is_in_time_from_now, from_now
 
-# Create your models here.
 class User(models.Model):
     ROLE_CHOICES = (
         ('A', 'admin'),
@@ -23,17 +22,36 @@ class Code(models.Model):
     issuer = models.ForeignKey(User, on_delete=models.CASCADE)
     money = models.IntegerField(default=0)
     description = models.CharField(max_length=255)
-    activates = models.DateTimeField()
-    expires = models.DateTimeField()
-    per_person_limit = models.IntegerField(null=True)
-    people_limit = models.IntegerField(null=True)
+    activates = models.DateTimeField(default=from_now())
+    expires = models.DateTimeField(default=from_now(d_minutes=5))
+    per_person_limit = models.PositiveIntegerField(null=True)
+    use_limit = models.PositiveIntegerField(null=True)
 
     def is_valid(self):
-        was_activated = self.activates <= now()
-        expired = self.expires < now()
+        was_activated = self.activates <= from_now()
+        expired = self.expires < from_now()
         return was_activated and not expired
 
 class Transaction(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.ForeignKey(Code, on_delete=models.CASCADE)
     timestamp = models.DateTimeField()
+
+def user_may_make_code(uid, code_params):
+    user = User.objects.get(uid=uid)
+    
+    if user.role in ('S', 'A'):
+        return True
+    
+    if (
+        user.role == 'U' 
+        and code_params['use_limit'] == 1 
+        and user.money >= code_params['money'] 
+        and code_params['money'] > 0
+        and is_in_time_from_now(code_params['expires'], mins=5)
+        and is_in_time_from_now(code_params['activates'], mins=0)
+    ):
+        return True
+
+
+    return False

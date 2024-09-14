@@ -1,4 +1,4 @@
-import { useAuth } from "../firebase";
+import { useAuth } from "../hooks/firebase";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { backend } from "../../config.js"
