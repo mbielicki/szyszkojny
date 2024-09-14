@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/firestore'
 import 'firebase/compat/auth'
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 
 firebase.initializeApp({
         apiKey: "AIzaSyCAFTW9lZZs_Rov1vIo-HuXVI-QaCrHsm8",
@@ -21,13 +21,10 @@ export const provider = new firebase.auth.GoogleAuthProvider();
 
 export type User = firebase.User
 export const persistence = firebase.auth.Auth.Persistence
-export const useAuth: () => [User | null, Dispatch<SetStateAction<User | null>>] = () => {
-    const [user, setUser] = useState<User | null>(auth.currentUser)
-    useEffect(() => {
-        auth.onAuthStateChanged(setUser)
-    }, [])
-    return [user, setUser]
-}
+
+
+type UserState = {user: User | null, setUser: Dispatch<SetStateAction<User | null>>}
+export const UserContext = createContext<UserState>({user: null, setUser: () => {}})
 
 
 export class NoUserError extends Error {

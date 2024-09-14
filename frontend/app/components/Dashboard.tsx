@@ -1,14 +1,17 @@
-import { useAuth } from "../hooks/firebase";
-import { useEffect, useState } from "react";
+import { UserContext } from "../firebase";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { backend } from "../../config.js"
 import Header from "./Header";
 import Footer from "./Footer";
 import MyBalance from "./MyBalance";
+import { Navigation, useNav } from "../hooks/useNav";
+import MyCodes from "./MyCodes";
 
 export default function Dashboard() {
     const [money, setMoney] = useState<number | null>(null)
-    const [user, setUser] = useAuth()
+    const [nav, setNav] = useNav()
+    const { user } = useContext(UserContext)
 
     useEffect(() => {
         const logIn = async () => {
@@ -22,9 +25,10 @@ export default function Dashboard() {
 
     return (
         <div className="flex h-full flex-col">
-            <Header user={user} />
-            <MyBalance money={money} />
-            <Footer />
+            <Header />
+            {nav === Navigation.balance && <MyBalance money={money} />}
+            {nav === Navigation.codes && <MyCodes />}
+            <Footer nav={nav} setNav={setNav} />
         </div>
     );
 }

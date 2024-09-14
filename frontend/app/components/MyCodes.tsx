@@ -1,9 +1,10 @@
 import axios from "axios"
-import { NoUserError, useAuth } from "../hooks/firebase"
+import { NoUserError, UserContext } from "../firebase"
 import { backend } from "@/config"
+import { useContext } from "react"
 
-export default function MakeQr({ className, text = "🌲" }: { className?: string, text?: string }) {
-    const [user, setUser] = useAuth()
+export default function MyCodes() {
+    const { user } = useContext(UserContext)
     const makeQr = async () => {
         if (!user) throw new NoUserError('Failed to generate QR code')
         const res = await axios.post(backend + 'make-qr/', {
@@ -19,6 +20,11 @@ export default function MakeQr({ className, text = "🌲" }: { className?: strin
         // display qr code
     }
     return user && (
-        <button className={className} onClick={makeQr}>{text}</button>
+        <main className="flex-1 flex flex-col items-center justify-center gap-2">
+            <h1 className="text-4xl">Wygeneruj kod QR</h1>
+            <form action={makeQr}>
+                <button type="submit" >Wygeneruj</button>
+            </form>
+        </main>
     )
 }
