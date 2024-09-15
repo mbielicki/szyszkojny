@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 
 export enum Navigation {
+    codes,
     balance,
     newCode
 }

@@ -1,13 +1,15 @@
 import axios from "axios"
 import { NoUserError, UserContext } from "../firebase"
 import { backend } from "@/config"
-import { useContext, useState } from "react"
+import { Dispatch, SetStateAction, useContext, useState } from "react"
 import TextField from '@mui/material/TextField';
 import { Button } from "@mui/material";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from "dayjs";
+import { Navigation } from "../hooks/useNav";
 
-export default function NewCode() {
+// TODO: check if user has permissions to select use limit and activates etc
+export default function NewCode({ setNav }: { setNav: Dispatch<SetStateAction<Navigation>> }) {
     const { user } = useContext(UserContext)
 
     const [description, setDescription] = useState('Przelew')
@@ -31,7 +33,7 @@ export default function NewCode() {
             }
         })
         console.log(res.data)
-        // display qr code
+        setNav(Navigation.codes)
     }
     return user && (
         <main className="flex-1 flex flex-col items-center justify-center gap-5">
