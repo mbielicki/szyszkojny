@@ -18,16 +18,35 @@ firebase_app = initialize_app(cred)
 def authenticate(id_token: str) -> dict:
     if TESTING and id_token == 'test_id_token':
         user, _ = User.objects.get_or_create(uid='test_uid', defaults={'username': 'test_name'})
-        return {'uid': 'test_uid', 'name': 'test_name'}
+        return {'uid': user.uid, 'name': user.username}
     user_info = verify_id_token(id_token, clock_skew_seconds=5)
     uid = user_info['uid']
     auth.get_user(uid)  # check if user exists
     return user_info
 
+
+@api_view(['POST'])
+def my_codes(request):
+    id_token = request.data['id_token']
+    try:
+        user_info = authenticate(id_token)
+    except InvalidIdTokenError as e:
+        return Response(str(e), status=400)
+    uid = user_info['uid']
+    codes = Code.objects.filter(issuer__uid=uid)
+    serializer = CodeSerializer(codes, many=True)
+    res_body = {
+        'results': serializer.data
+    }
+    return Response(res_body)
+
 @api_view(['POST'])
 def make_qr(request):
     id_token = request.data['id_token']
-    user_info = authenticate(id_token)
+    try:
+        user_info = authenticate(id_token)
+    except InvalidIdTokenError as e:
+        return Response(str(e), status=400)
     uid = user_info['uid']
 
     code_params = request.data['code_params']

@@ -13,13 +13,13 @@ export default function MyCodes() {
         const fetchMyCodes = async () => {
             const res = await axios.post(backend + 'my-codes/', { id_token: await user.getIdToken() })
             if (res.status === 200)
-                setCodes(res.data)
+                setCodes(res.data.results)
         }
         fetchMyCodes()
-    })
+    }, [])
 
     return (
-        <main className="flex-1 flex flex-col items-center justify-center gap-2">
+        <main className="flex-1 flex flex-col items-center justify-center gap-2 overflow-auto">
             {codes.map((code) => <Code key={code.code} code={code} />)}
         </main>
     )
