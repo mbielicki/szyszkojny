@@ -17,3 +17,21 @@ body {
         text-wrap: balance;
     }
 }
+
+::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-300 hover:bg-gray-400;
+}
+
+@media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-gray-600 hover:bg-gray-800;
+    }
+}

@@ -19,7 +19,7 @@ export default function MyCodes() {
     }, [])
 
     return (
-        <main className="flex-1 flex flex-col items-center justify-center gap-2 overflow-auto">
+        <main className="flex-1 flex flex-col gap-5 px-5 overflow-auto">
             {codes.map((code) => <Code key={code.code} code={code} />)}
         </main>
     )
