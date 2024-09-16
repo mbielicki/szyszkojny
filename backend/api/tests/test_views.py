@@ -114,3 +114,30 @@ class TestViews(TestCase):
         self.assertJSONEqual(response.content, {
             'results': []
         })
+
+    def test_get_code(self):
+        user = User.objects.create(
+            uid='test_uid',
+            username='test_name',
+            role='U'
+        )
+        code = Code.objects.create(
+            code='test_code',
+            issuer=user,
+            money=10,
+            description='test_description',
+            per_person_limit=10,
+            use_limit=1,
+        )
+        response = self.client.get(reverse('get-code', args=[code.code]))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'code': code.code,
+            'issuer': user.uid,
+            'money': code.money,
+            'description': code.description,
+            'per_person_limit': code.per_person_limit,
+            'use_limit': code.use_limit,
+            'activates': code.activates.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
+            'expires': code.expires.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
+        })

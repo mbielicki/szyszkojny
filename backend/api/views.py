@@ -87,3 +87,13 @@ def get_user(request, uid):
         return Response(status=404)
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_code(request, code):
+    try:
+        code = Code.objects.get(code=code)
+    except Code.DoesNotExist:
+        return Response(status=404)
+    serializer = CodeSerializer(code)
+    return Response(serializer.data)

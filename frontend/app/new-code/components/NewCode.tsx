@@ -1,6 +1,6 @@
 import axios from "axios"
 import { NoUserError, UserContext } from "../../firebase"
-import { backend } from "@/config"
+import { api } from "@/config"
 import { useContext, useState } from "react"
 import TextField from '@mui/material/TextField';
 import { Button } from "@mui/material";
@@ -22,7 +22,7 @@ export default function NewCode() {
 
     const makeQr = async () => {
         if (!user) throw new NoUserError('Failed to generate QR code')
-        const res = await axios.post(backend + 'make-qr/', {
+        const res = await axios.post(api + 'make-qr/', {
             id_token: await user.getIdToken(),
             code_params: {
                 'money': money,

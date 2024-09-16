@@ -1,4 +1,4 @@
-import { backend } from "@/config"
+import { api } from "@/config"
 import axios from "axios"
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../firebase"
@@ -11,7 +11,7 @@ export default function MyBalance() {
     useEffect(() => {
         const logIn = async () => {
             if (!user) return
-            const res = await axios.post(backend + 'log-in/', { id_token: await user.getIdToken() })
+            const res = await axios.post(api + 'log-in/', { id_token: await user.getIdToken() })
             if ([200, 201].includes(res.status))
                 setMoney(res.data['money'])
         }
