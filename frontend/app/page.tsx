@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import Dashboard from "./components/Dashboard";
 import LogIn from "./components/LogIn";
-import { auth, User, UserContext } from "./firebase";
+import { UserContext } from "./firebase";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -37,20 +37,14 @@ const theme = createTheme({
 })
 
 export default function Home() {
-  const [user, setUser] = useState<User | null>(auth.currentUser)
-
-  useEffect(() => {
-    auth.onAuthStateChanged(setUser)
-  }, [])
+  const { user, setUser } = useContext(UserContext)
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-          <CssBaseline />
-          {user ? <Dashboard /> : <LogIn />}
-        </LocalizationProvider>
-      </ThemeProvider>
-    </UserContext.Provider>
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+        <CssBaseline />
+        {user ? <Dashboard /> : <LogIn />}
+      </LocalizationProvider>
+    </ThemeProvider>
   );
 }

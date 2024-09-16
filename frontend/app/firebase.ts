@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/firestore'
 import 'firebase/compat/auth'
-import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
 
 firebase.initializeApp({
         apiKey: "AIzaSyCAFTW9lZZs_Rov1vIo-HuXVI-QaCrHsm8",
