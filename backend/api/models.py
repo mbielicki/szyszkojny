@@ -1,5 +1,6 @@
+from uuid import uuid4
 from django.db import models
-from api.utils import is_in_time_from_now, from_now
+from api.utils import is_in_time_from_now, from_now, uuid
 
 class User(models.Model):
     ROLE_CHOICES = (
@@ -18,7 +19,7 @@ class User(models.Model):
     
 
 class Code(models.Model):
-    code = models.CharField(max_length=255, primary_key=True)
+    code = models.CharField(max_length=255, primary_key=True, default=uuid)
     issuer = models.ForeignKey(User, on_delete=models.CASCADE)
     money = models.IntegerField(default=0)
     description = models.CharField(max_length=255)
@@ -26,16 +27,32 @@ class Code(models.Model):
     expires = models.DateTimeField(default=from_now(d_minutes=5))
     per_person_limit = models.PositiveIntegerField(null=True)
     use_limit = models.PositiveIntegerField(null=True)
+    use_count = models.IntegerField(default=0)
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         was_activated = self.activates <= from_now()
         expired = self.expires < from_now()
         return was_activated and not expired
+    
+    def expired(self) -> bool:
+        return self.expires < from_now()
+    
+    def activated(self) -> bool:
+        return self.activates <= from_now()
+    
+    def is_used_up(self) -> bool:
+        if self.use_limit is None:
+            return False
+        return self.use_count >= self.use_limit
+    
+    def use_by_count(self, user: User) -> int:
+        return Transaction.objects.filter(receiver=user, code=self).count()
+    
 
 class Transaction(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.ForeignKey(Code, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 def user_may_make_code(uid, code_params):
     user = User.objects.get(uid=uid)

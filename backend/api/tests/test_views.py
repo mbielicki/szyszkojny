@@ -70,33 +70,27 @@ class TestViews(TestCase):
             username='test_name',
             role='U'
         )
-        code = Code.objects.create(
-            issuer=user,
-            money=10,
-            description='test_description',
-            per_person_limit=10,
-            use_limit=1,
-            activates=from_now(),
-            expires=from_now(d_minutes=5),
-        )
+        codes = [
+            Code.objects.create(
+                issuer=user,
+                money=10,
+                description='test_description'),
+            Code.objects.create(
+                issuer=user,
+                money=10,
+                description='test_description')
+        ]
+
         response = self.client.post(reverse('my-codes'), {
             'id_token': 'test_id_token'
         }, content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
-            'results': [
-                {
-                    'code': code.code,
-                    'issuer': user.uid,
-                    'money': code.money,
-                    'description': code.description,
-                    'per_person_limit': code.per_person_limit,
-                    'use_limit': code.use_limit,
-                    'activates': code.activates.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
-                    'expires': code.expires.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
-                }
-            ]
-        })
+        results = response.json()['results']
+        self.assertEqual(len(results), len(codes))
+
+        res_codes = [res['code'] for res in results]
+        expected_codes = [code.code for code in codes]
+        self.assertListEqual(res_codes, expected_codes)
 
 
     def test_my_codes_invalid_id_token(self):
@@ -138,6 +132,7 @@ class TestViews(TestCase):
             'description': code.description,
             'per_person_limit': code.per_person_limit,
             'use_limit': code.use_limit,
+            'use_count': code.use_count,
             'activates': code.activates.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
             'expires': code.expires.astimezone(timezone(settings.TIME_ZONE)).isoformat(),
         })

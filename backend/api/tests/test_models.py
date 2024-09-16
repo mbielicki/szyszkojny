@@ -46,6 +46,8 @@ class CodeModelTestCase(TestCase):
             expires=from_now(d_days=1)
         )
         self.assertTrue(code.is_valid())
+        self.assertFalse(code.expired())
+        self.assertTrue(code.activated())
 
     def test_code_expired(self):
         code = Code.objects.create(
@@ -57,6 +59,7 @@ class CodeModelTestCase(TestCase):
             expires=from_now(d_days=-1)
         )
         self.assertFalse(code.is_valid())
+        self.assertTrue(code.expired())
 
     def test_code_not_activated(self):
         code = Code.objects.create(
@@ -68,6 +71,39 @@ class CodeModelTestCase(TestCase):
             expires=from_now(d_days=2)
         )
         self.assertFalse(code.is_valid())
+        self.assertFalse(code.activated())
+
+    def test_code_is_used_up(self):
+        code = Code.objects.create(
+            code='test_code',
+            issuer=User.objects.create(uid='test_uid', username='test_username', role='U'),
+            money=100,
+            description='Test code',
+            activates=from_now(d_days=1),
+            expires=from_now(d_days=2),
+            use_limit=1,
+        )
+        self.assertFalse(code.is_used_up())
+        code.use_count += 1
+        self.assertTrue(code.is_used_up())
+
+    def test_code_use_by_count(self):
+        user = User.objects.create(uid='test_uid', username='test_username', role='U')
+        code = Code.objects.create(
+            code='test_code',
+            issuer=user,
+            money=100,
+            description='Test code',
+            activates=from_now(d_days=1),
+            expires=from_now(d_days=2),
+            per_person_limit=1
+        )
+        self.assertEqual(code.use_by_count(user), 0)
+        Transaction.objects.create(
+            receiver=user,
+            code=code
+        )
+        self.assertEqual(code.use_by_count(user), 1)
 
 class TransactionModelTestCase(TestCase):
     def test_transaction_creation(self):

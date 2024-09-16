@@ -1,11 +1,13 @@
-from uuid import uuid4
+from django.db import transaction
+from pytz import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from firebase_admin import initialize_app, credentials, auth
 from firebase_admin.auth import verify_id_token, InvalidIdTokenError
-from szyszkojny.settings import TESTING
+from api.utils import uuid
+from szyszkojny.settings import TESTING, TIME_ZONE
 
-from .models import Code, User, user_may_make_code
+from .models import Code, Transaction, User, user_may_make_code
 from .serializers import CodeSerializer, UserSerializer
 
 from dotenv import load_dotenv
@@ -15,6 +17,7 @@ load_dotenv()
 cred = credentials.Certificate(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY'))
 firebase_app = initialize_app(cred)
 
+# TODO: raise AuthenticationFailed
 def authenticate(id_token: str) -> dict:
     if TESTING and id_token == 'test_id_token':
         user, _ = User.objects.get_or_create(uid='test_uid', defaults={'username': 'test_name'})
@@ -51,7 +54,7 @@ def make_qr(request):
 
     code_params = request.data['code_params']
     code_params['issuer'] = uid
-    code_params['code'] = str(uuid4()).replace('-', '')
+    code_params['code'] = uuid()
     serializer = CodeSerializer(data=code_params)
 
     if not serializer.is_valid():
@@ -97,3 +100,80 @@ def get_code(request, code):
         return Response(status=404)
     serializer = CodeSerializer(code)
     return Response(serializer.data)
+
+@transaction.atomic
+@api_view(['POST'])
+def use_code(request):
+    id_token = request.data['id_token']
+    try:
+        user_info = authenticate(id_token)
+    except InvalidIdTokenError as e:
+        return Response(str(e), status=400)
+    uid = user_info['uid']
+    user = User.objects.get(uid=uid)
+    try:
+        code = Code.objects.get(code=request.data['code'])
+    except Code.DoesNotExist:
+        return Response({'error': 'Code not found'}, status=404)
+    
+    if code.expired():
+        error_message = 'Code expired'
+        error_data = {
+            'error': error_message,
+            'expires': code.expires.astimezone(timezone(TIME_ZONE)).isoformat()
+        }
+        return Response(error_data, status=400)
+    
+    if not code.activated():
+        error_message = 'Code not activated'
+        error_data = {
+            'error': error_message,
+            'activates': code.activates.astimezone(timezone(TIME_ZONE)).isoformat()
+        }
+        return Response(error_data, status=400)
+    
+    if code.is_used_up():
+        error_message = 'Code used up'
+        error_data = {
+            'error': error_message,
+            'use_limit': code.use_limit,
+            'use_count': code.use_count
+        }
+        return Response(error_data, status=400)
+    
+    used_by_this_user = code.use_by_count(user)
+    if code.per_person_limit is not None and used_by_this_user >= code.per_person_limit:
+        error_message = 'Code used up for you'
+        error_data = {
+            'error': error_message,
+            'per_person_limit': code.per_person_limit,
+            'used_by_you': used_by_this_user
+        }
+        return Response(error_data, status=400)
+    
+    user_money_after = user.money + code.money
+    if user_money_after < 0:
+        error_message = 'Not enough money'
+        error_data = {
+            'error': error_message,
+            'your_money': user.money,
+            'code_money': code.money
+        }
+        return Response(error_data, status=400)
+
+    code.use_count += 1
+    code.save()
+
+    user.money = user_money_after
+    user.save()
+
+# TODO: check if user has enough money
+    issuer = code.issuer
+    issuer.money -= code.money
+    issuer.save()
+
+    Transaction.objects.create(
+        receiver=user,
+        code=code
+    )
+    return Response(status=200)

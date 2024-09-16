@@ -16,9 +16,9 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
     useEffect(() => {
         axios.get(api + 'get-code/' + id)
             .then(res => setCode(res.data))
-            .catch(console.error)
+            .catch(alert)
             .finally(() => setLoading(false))
-    })
+    }, [])
 
     return (
         <main className="flex-1 flex flex-col gap-5 px-5 overflow-auto">

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from uuid import uuid4
 from django.utils import timezone
 
 def from_now(d_days=0, d_hours=0, d_minutes=0, d_seconds=0):
@@ -12,3 +13,6 @@ def is_in_time_from_now(time: str, mins: int) -> bool:
 
 def equals(a: datetime, b: datetime, error: timedelta) -> bool:
     return a - error <= b <= a + error
+
+def uuid() -> str:
+    return str(uuid4()).replace('-', '')
