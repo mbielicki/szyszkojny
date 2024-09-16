@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import UserContextComponent from "./components/UserContextComponent";
+import MuiTheme from "./components/MuiTheme";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Twój portfel szyszkojnów.",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserContextComponent>
-          {children}
-        </UserContextComponent>
+        <MuiTheme>
+          <UserContextComponent>
+            {children}
+          </UserContextComponent>
+        </MuiTheme>
       </body>
     </html>
   );
