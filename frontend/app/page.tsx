@@ -2,7 +2,7 @@
 
 import MyBalance from "./components/MyBalance";
 
-export default function Home() {
+export default function Page() {
 	return (
 		<MyBalance />
 	);

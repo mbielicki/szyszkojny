@@ -2,7 +2,7 @@
 
 import NewCode from "./components/NewCode";
 
-export default function Home() {
+export default function Page() {
     return (
         <NewCode />
     );
