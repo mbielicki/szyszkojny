@@ -5,10 +5,11 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
-import { DateTimeField } from '@mui/x-date-pickers/DateTimeField/DateTimeField';
+import Image from 'next/image'
 
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import 'dayjs/locale/pl';
+import QRCode from 'react-qr-code';
 dayjs.locale('pl');
 
 export type QrCode = {
@@ -25,9 +26,9 @@ dayjs.extend(localizedFormat)
 export default function Code({ code }: { code: QrCode }) {
     return (
         <Card className='flex-shrink-0'>
-            <CardMedia className='aspect-square'
-                image="/some-qr.svg"
-            />
+            <QRCode
+                className='bg-white p-2 w-full h-fit'
+                value={code.code} />
             <CardContent>
                 <Typography gutterBottom variant="h5" >
                     {code.description}

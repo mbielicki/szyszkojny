@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-6*2xmprx=o&0)4)5%nplv$b$l=35vds8435$$*q5%-ea$)@d)#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.0.101"]
 
 TESTING = sys.argv[1:2] == ['test']
 
@@ -62,6 +62,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:....$",
     r"^http://127\.0\.0\.1:....$",
+    r"^http://192\.168\.0\.1..:....$",
 ]
 
 ROOT_URLCONF = 'szyszkojny.urls'
