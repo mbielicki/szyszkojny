@@ -1,6 +1,6 @@
 import { backend } from "@/config"
 import axios from "axios"
-import { UserContext } from "../firebase"
+import { UserContext } from "@/app/firebase"
 import { useContext, useEffect, useState } from "react"
 import Code, { QrCode } from "./Code"
 

@@ -1,16 +1,17 @@
 import axios from "axios"
-import { NoUserError, UserContext } from "../firebase"
+import { NoUserError, UserContext } from "../../firebase"
 import { backend } from "@/config"
-import { Dispatch, SetStateAction, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import TextField from '@mui/material/TextField';
 import { Button } from "@mui/material";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from "dayjs";
-import { Navigation } from "../hooks/useNav";
+import { useRouter } from "next/navigation";
 
 // TODO: check if user has permissions to select use limit and activates etc
-export default function NewCode({ setNav }: { setNav: Dispatch<SetStateAction<Navigation>> }) {
+export default function NewCode() {
     const { user } = useContext(UserContext)
+    const router = useRouter()
 
     const [description, setDescription] = useState('Przelew')
     const [money, setMoney] = useState(0)
@@ -33,8 +34,9 @@ export default function NewCode({ setNav }: { setNav: Dispatch<SetStateAction<Na
             }
         })
         console.log(res.data)
-        setNav(Navigation.codes)
+        router.push('/my-codes')
     }
+
     return user && (
         <main className="flex-1 flex flex-col items-center justify-center gap-5">
             <h1 className="text-4xl">Wygeneruj kod QR</h1>

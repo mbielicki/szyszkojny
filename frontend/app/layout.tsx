@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import UserContextComponent from "./components/UserContextComponent";
 import MuiTheme from "./components/MuiTheme";
+import Dashboard from "./components/Dashboard";
+import LoggedIn from "./components/LoggedIn";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,7 +35,11 @@ export default function RootLayout({
       >
         <MuiTheme>
           <UserContextComponent>
-            {children}
+            <LoggedIn>
+              <Dashboard>
+                {children}
+              </Dashboard>
+            </LoggedIn>
           </UserContextComponent>
         </MuiTheme>
       </body>
