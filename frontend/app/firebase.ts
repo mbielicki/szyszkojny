@@ -23,8 +23,13 @@ export type User = firebase.User
 export const persistence = firebase.auth.Auth.Persistence
 
 
-type UserState = {user: User | null, setUser: Dispatch<SetStateAction<User | null>>}
-export const UserContext = createContext<UserState>({user: null, setUser: () => {}})
+type UserContextValues = {
+    user: User | null, 
+    setUser: Dispatch<SetStateAction<User | null>>,
+    loading: boolean,
+    setLoading: Dispatch<SetStateAction<boolean>>
+}
+export const UserContext = createContext({} as UserContextValues)
 
 
 export class NoUserError extends Error {

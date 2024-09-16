@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { auth, provider, UserContext } from "../firebase";
+import { Button } from "@mui/material";
 
 export class SignInError extends Error {
     constructor(message: string) {
@@ -21,7 +22,11 @@ export default function LogIn() {
 
     return (
         <div className="flex h-full flex-col items-center justify-center">
-            <button onClick={signInWithGoogle}>Zaloguj się</button>
+            <Button
+                variant="outlined"
+                onClick={signInWithGoogle}>
+                Zaloguj się
+            </Button>
         </div>
     )
 }
