@@ -7,7 +7,11 @@ export default function ProfilePicture() {
 
     // TODO: Add onError to show blank profile picture
     return (
-        <Image className="rounded-full" src={user?.photoURL ?? "/blank-profile-picture.webp"}
-            width={32} height={32} alt="profile picture" />
+        <div className="h-full p-2 aspect-square">
+            <div className="relative size-full ">
+                <Image className="rounded-full" src={user?.photoURL ?? "/blank-profile-picture.webp"}
+                    fill alt="profile picture" />
+            </div>
+        </div>
     )
 }

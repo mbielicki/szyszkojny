@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --footer-h: 4rem;
+    --header-h: 4rem;
+    --main-h: calc(100vh - var(--footer-h) - var(--header-h));
+}
+
 html {
     height: 100%;
 }
