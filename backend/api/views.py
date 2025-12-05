@@ -5,21 +5,29 @@ from rest_framework.decorators import api_view
 from firebase_admin import initialize_app, credentials, auth
 from firebase_admin.auth import verify_id_token, InvalidIdTokenError
 from api.utils import uuid
-from szyszkojny.settings import TESTING, TIME_ZONE
+from szyszkojny.settings import TESTING, TIME_ZONE, BASE_DIR
+from django.apps import apps # Added this import
 
-from .models import Code, Transaction, User, user_may_make_code
+from .models import Code, Transaction, user_may_make_code # Modified import - User removed
 from .serializers import CodeSerializer, UserSerializer
 
 from dotenv import load_dotenv
 import os
+import json
+
+# Define User model here for local scope using apps.get_model
+User = apps.get_model('api', 'User') # New definition
 
 load_dotenv()
-cred = credentials.Certificate(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY'))
+with open(BASE_DIR / "secrets/serviceAccountKey.json") as json_file:
+    cert = json.load(json_file)
+cred = credentials.Certificate(cert)
 firebase_app = initialize_app(cred)
 
 # TODO: raise AuthenticationFailed
 def authenticate(id_token: str) -> dict:
     if TESTING and id_token == 'test_id_token':
+        # Now User is defined at module level via apps.get_model
         user, _ = User.objects.get_or_create(uid='test_uid', defaults={'username': 'test_name'})
         return {'uid': user.uid, 'name': user.username}
     user_info = verify_id_token(id_token, clock_skew_seconds=5)

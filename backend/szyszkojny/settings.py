@@ -14,7 +14,7 @@ from pathlib import Path
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-6*2xmprx=o&0)4)5%nplv$b$l=35vds8435$$*q5%-ea$)@d)#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.0.101", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["65.21.153.119", "192.168.0.101", "127.0.0.1", "localhost"]
 
 TESTING = sys.argv[1:2] == ['test']
 
@@ -48,21 +48,19 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:....$",
     r"^http://127\.0\.0\.1:....$",
     r"^http://192\.168\.0\.1..:....$",
+    r"^http://65\.21\.153\.119:....$",
 ]
 
 ROOT_URLCONF = 'szyszkojny.urls'
