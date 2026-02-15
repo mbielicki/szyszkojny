@@ -65,6 +65,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:\d+$",
     r"^http://127\.0\.0\.1:\d+$",
     r"^http://192\.168\.\d{1,3}\.\d{1,3}:\d+$",
+    r"^https://szyszkojny-frontend[\w.-]*\.run\.app$",
 ]
 
 _cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '')
