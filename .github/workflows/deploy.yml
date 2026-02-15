@@ -6,8 +6,8 @@ on:
 
 env:
   PROJECT_ID: szyszkojny
-  REGION: europe-central2
-  REGISTRY: europe-central2-docker.pkg.dev/szyszkojny/szyszkojny
+  REGION: us-central1
+  REGISTRY: us-central1-docker.pkg.dev/szyszkojny/szyszkojny
 
 jobs:
   changes:
