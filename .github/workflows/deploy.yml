@@ -1,0 +1,130 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_ID: szyszkojny
+  REGION: europe-central2
+  REGISTRY: europe-central2-docker.pkg.dev/szyszkojny/szyszkojny
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  deploy-backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push
+        run: |
+          docker build -t ${{ env.REGISTRY }}/backend:${{ github.sha }} backend/
+          docker push ${{ env.REGISTRY }}/backend:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy szyszkojny-backend \
+            --image ${{ env.REGISTRY }}/backend:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8000 \
+            --min-instances 0 \
+            --max-instances 2 \
+            --memory 512Mi \
+            --set-secrets "GOOGLE_SERVICE_ACCOUNT_KEY=firebase-sa-key:latest,FIREBASE_CONFIG=firebase-config:latest,DJANGO_SECRET_KEY=django-secret-key:latest,DATABASE_URL=database-url:latest" \
+            --set-env-vars "DEBUG=false,ALLOWED_HOSTS=*"
+
+  deploy-frontend:
+    needs: [changes, deploy-backend]
+    if: |
+      always() &&
+      needs.changes.outputs.frontend == 'true' &&
+      (needs.deploy-backend.result == 'success' || needs.deploy-backend.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Get backend URL
+        id: backend-url
+        run: |
+          URL=$(gcloud run services describe szyszkojny-backend \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          echo "url=${URL}/api/" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ steps.backend-url.outputs.url }} \
+            -t ${{ env.REGISTRY }}/frontend:${{ github.sha }} \
+            frontend/
+          docker push ${{ env.REGISTRY }}/frontend:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy szyszkojny-frontend \
+            --image ${{ env.REGISTRY }}/frontend:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 3000 \
+            --min-instances 0 \
+            --max-instances 2 \
+            --memory 512Mi
+
+      - name: Set CORS on backend
+        run: |
+          FRONTEND_URL=$(gcloud run services describe szyszkojny-frontend \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          gcloud run services update szyszkojny-backend \
+            --region ${{ env.REGION }} \
+            --update-env-vars "CORS_ALLOWED_ORIGINS=${FRONTEND_URL}"
