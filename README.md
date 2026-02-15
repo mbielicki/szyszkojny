@@ -19,6 +19,14 @@ Szyszkojny is a web application that allows users to collect and transfer points
     -   `app/` – Main application pages and components
 -   `secrets/` – Configuration and secret files (not for public sharing)
 
+## Try It Out
+
+Scan this QR code in the app to earn your first coins:
+
+<p align="center">
+  <img src="tutorial-qr.png" alt="Tutorial QR code" width="250">
+</p>
+
 ## Getting Started
 
 ### Prerequisites
