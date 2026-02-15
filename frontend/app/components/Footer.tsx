@@ -1,25 +1,61 @@
-import LogOut from "./LogOut";
+"use client"
+import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { BottomNavigation, BottomNavigationAction, Fab, Paper } from "@mui/material";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+
+const navItems = [
+    { label: "Kody", href: "/my-codes", icon: <QrCodeScannerIcon /> },
+    { label: "Saldo", href: "/", icon: <AccountBalanceWalletIcon /> },
+    { label: "Nowy", href: "/new-code", icon: <AddCircleIcon /> },
+];
 
 export default function Footer() {
+    const pathname = usePathname();
+    const currentIndex = navItems.findIndex(item => item.href === pathname);
+
     return (
-        <footer className="h-[--footer-h] flex gap-6 flex-wrap items-center justify-center text-4xl">
-            <LogOut className="text-4xl hover:opacity-10" text="🏠" />
-            <Link
-                className="text-4xl"
-                href="/my-codes">
-                Q
-            </Link>
-            <Link
-                className="text-4xl"
-                href="/">
-                🪙
-            </Link>
-            <Link
-                className="text-4xl"
-                href="/new-code">
-                🌲
-            </Link>
-        </footer>
-    )
+        <Paper
+            component="footer"
+            elevation={3}
+            className="h-[--footer-h]"
+            sx={{ position: 'relative', zIndex: 1 }}
+        >
+            <BottomNavigation
+                value={currentIndex}
+                showLabels
+                sx={{ height: '100%', backgroundColor: 'transparent' }}
+            >
+                {navItems.map((item, i) =>
+                    i === 1 ? (
+                        <BottomNavigationAction
+                            key={item.href}
+                            label={item.label}
+                            icon={
+                                <Fab
+                                    color="secondary"
+                                    size="medium"
+                                    component={Link}
+                                    href={item.href}
+                                    sx={{ mt: -4, mb: 0.5, boxShadow: 3 }}
+                                >
+                                    {item.icon}
+                                </Fab>
+                            }
+                        />
+                    ) : (
+                        <BottomNavigationAction
+                            key={item.href}
+                            label={item.label}
+                            icon={item.icon}
+                            component={Link}
+                            href={item.href}
+                        />
+                    )
+                )}
+            </BottomNavigation>
+        </Paper>
+    );
 }

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    --footer-h: 4rem;
+    --footer-h: 4.5rem;
     --header-h: 4rem;
     --main-h: calc(100vh - var(--footer-h) - var(--header-h));
 }
