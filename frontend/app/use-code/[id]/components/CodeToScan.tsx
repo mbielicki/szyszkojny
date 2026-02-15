@@ -29,6 +29,7 @@ export default function MyCode({ code }: { code: CodeInfo }) {
             <CodeCardContent code={code} />
             <CardActions>
                 <Button size="small" onClick={useCode}>Akceptuj</Button>
+                <Button size="small" color="error" onClick={() => router.push("/")}>Odrzuć</Button>
             </CardActions>
         </Card>
     )
