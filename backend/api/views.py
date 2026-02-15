@@ -11,10 +11,15 @@ from .models import Code, Transaction, User, user_may_make_code
 from .serializers import CodeSerializer, UserSerializer
 
 from dotenv import load_dotenv
+import json
 import os
 
 load_dotenv()
-cred = credentials.Certificate(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY'))
+_sa_key = os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY', '')
+if _sa_key.lstrip().startswith('{'):
+    cred = credentials.Certificate(json.loads(_sa_key))
+else:
+    cred = credentials.Certificate(_sa_key)
 firebase_app = initialize_app(cred)
 
 # TODO: raise AuthenticationFailed
