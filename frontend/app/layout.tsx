@@ -5,6 +5,7 @@ import UserContextComponent from "./components/UserContextComponent";
 import MuiTheme from "./components/MuiTheme";
 import Dashboard from "./components/Dashboard";
 import LoggedIn from "./components/LoggedIn";
+import Eruda from "./components/Eruda";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Eruda />
         <MuiTheme>
           <UserContextComponent>
             <LoggedIn>
