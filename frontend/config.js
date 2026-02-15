@@ -1,1 +1,2 @@
-export const api = "http://192.168.0.101:8000/api/";
+const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+export const api = `http://${host}:8000/api/`;

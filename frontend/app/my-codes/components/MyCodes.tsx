@@ -17,7 +17,7 @@ export default function MyCodes() {
                 setCodes(res.data.results)
         }
         fetchMyCodes()
-    }, [])
+    }, [user])
 
     return (
         <main className="flex-1 flex flex-col items-center gap-5 px-5 overflow-auto">
