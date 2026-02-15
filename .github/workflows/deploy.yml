@@ -3,11 +3,12 @@ name: Deploy to Cloud Run
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
   PROJECT_ID: szyszkojny
-  REGION: europe-central2
-  REGISTRY: europe-central2-docker.pkg.dev/szyszkojny/szyszkojny
+  REGION: us-central1
+  REGISTRY: us-central1-docker.pkg.dev/szyszkojny/szyszkojny
 
 jobs:
   changes:
@@ -25,12 +26,14 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
+              - '.github/workflows/deploy.yml'
             frontend:
               - 'frontend/**'
+              - '.github/workflows/deploy.yml'
 
   deploy-backend:
     needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -72,7 +75,7 @@ jobs:
     needs: [changes, deploy-backend]
     if: |
       always() &&
-      needs.changes.outputs.frontend == 'true' &&
+      (needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch') &&
       (needs.deploy-backend.result == 'success' || needs.deploy-backend.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
