@@ -107,6 +107,7 @@ jobs:
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_API_URL=${{ steps.backend-url.outputs.url }} \
+            --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             -t ${{ env.REGISTRY }}/frontend:${{ github.sha }} \
             frontend/
           docker push ${{ env.REGISTRY }}/frontend:${{ github.sha }}
