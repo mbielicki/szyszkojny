@@ -1,10 +1,15 @@
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://192.168.18.72:8000/api/
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    env_file:
+      - ./frontend/.env.local
 
   backend:
     build: ./backend
@@ -14,7 +19,7 @@ services:
       - ./secrets:/app/secrets:ro
       - backend-data:/app/data
     env_file:
-      - ./backend/.env
+      - ./backend/.env.local
 
 volumes:
   backend-data:

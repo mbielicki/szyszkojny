@@ -14,7 +14,7 @@ import { Page } from '@playwright/test';
  *    Firebase API key, replacing the auth initialization with mock reads.
  */
 
-const FIREBASE_API_KEY = 'AIzaSyCAFTW9lZZs_Rov1vIo-HuXVI-QaCrHsm8';
+const FIREBASE_API_KEY_MOCK_PLACEHOLDER = 'mock-firebase-api-key';
 
 /**
  * Regex matching the Firebase auth initialization block in the minified bundle.
@@ -22,6 +22,9 @@ const FIREBASE_API_KEY = 'AIzaSyCAFTW9lZZs_Rov1vIo-HuXVI-QaCrHsm8';
  */
 const AUTH_INIT_PATTERN =
   /let (\w+)=\w+\.\w+\.auth\(\);\1\.useDeviceLanguage\(\),\w+\.\w+\.firestore\(\);let (\w+)=new \w+\.\w+\.auth\.GoogleAuthProvider;\w+\.\w+\.auth\.Auth\.Persistence/;
+
+// A distinctive string from the firebase config to find the right chunk.
+const FIREBASE_CONFIG_IDENTIFIER = 'szyszkojny.firebaseapp.com';
 
 function addMockToWindow(page: Page, loggedIn: boolean) {
   return page.addInitScript((loggedIn: boolean) => {
@@ -68,7 +71,7 @@ function addMockToWindow(page: Page, loggedIn: boolean) {
 
 /**
  * Intercept Next.js page/layout chunks and patch any that contain the
- * Firebase initialization code (identified by the API key).
+ * Firebase initialization code (identified by the authDomain).
  */
 function patchFirebaseChunks(page: Page) {
   // Only intercept page-* and layout-* chunks (where firebase.ts module lives)
@@ -77,7 +80,7 @@ function patchFirebaseChunks(page: Page) {
       const response = await route.fetch();
       const body = await response.text();
 
-      if (!body.includes(FIREBASE_API_KEY)) {
+      if (!body.includes(FIREBASE_CONFIG_IDENTIFIER)) {
         await route.fulfill({
           body,
           contentType: 'application/javascript; charset=UTF-8',
